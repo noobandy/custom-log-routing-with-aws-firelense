@@ -1,0 +1,54 @@
+{
+    "family": "log-test-task-definition", 
+    "taskRoleArn": "arn:aws:iam::420975897895:role/LogTestTaskRole", 
+    "executionRoleArn": "arn:aws:iam::420975897895:role/ecsTaskExecutionRole", 
+    "networkMode": "awsvpc", 
+    "containerDefinitions": [
+                {"essential": true,
+                        "logConfiguration": {
+                                "logDriver": "awsfirelens"
+                        },
+                        "portMappings": [
+                                {
+                                        "hostPort": 8080,
+                                        "protocol": "tcp",
+                                        "containerPort": 8080
+                                }
+                        ],
+
+                        "image": "420975897895.dkr.ecr.ap-south-1.amazonaws.com/log-test",
+                        "dependsOn": [
+                                {
+                                        "containerName": "log_router",
+                                        "condition": "START"
+                                }
+                        ],
+                        "name": "log-test"
+                },
+                {"essential": true,
+                        "logConfiguration": {
+                                "logDriver": "awslogs",
+                                "options": {
+                                        "awslogs-group": "/ecs/log-test-task-definition",
+                                        "awslogs-region": "ap-south-1",
+                                        "awslogs-stream-prefix": "ecs"
+                                }
+                        },
+                        "image": "420975897895.dkr.ecr.ap-south-1.amazonaws.com/custom-fluentbit-config:latest",
+                        "firelensConfiguration": {
+                                "type": "fluentbit",
+                                "options": {
+                                        "config-file-type": "file",
+                                        "config-file-value": "/extra.conf",
+                                        "enable-ecs-log-metadata": "true"
+                                }
+                        },
+                        "name": "log_router"
+                }
+        ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ], 
+    "cpu": "256", 
+    "memory": "512"
+}
