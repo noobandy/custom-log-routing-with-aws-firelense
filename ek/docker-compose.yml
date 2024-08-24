@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  elk:
+    image: sebp/elk
+    environment:
+      - ES_HEAP_SIZE=2g
+      - LS_HEAP_SIZE=1g
+      - bootstrap.memory_lock=true
+      - LOGSTASH_START=0
+      - MAX_MAP_COUNT=262144 
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+    volumes:
+      - ./conf.d:/etc/logstash/conf.d
+      - ./elk-data:/var/lib/elasticsearch
+        # fluent-bit:
+        #image: cr.fluentbit.io/fluent/fluent-bit
+        #volumes:
+        #- ./fluentbit/fluentbit.conf:/fluent-bit/etc/fluent-bit.conf
+        #ports:
+        #- 24224:24224
+        #depends_on:
+        #- elk
+        #  log-test:
+        # image: log-test
+        # ports:
+        #- 8080:8080
+        #logging:
+        #driver: fluentd
+        # options:
+        # fluentd-address: fluent-bit:24224
+        # fluentd-async: "true" 
+        # depends_on: 
+        # - elk
+        #- fluent-bit
